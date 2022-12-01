@@ -139,12 +139,9 @@ public class Connection : IAsyncDisposable
             _sender?.Dispose();
         }
     }
-    public async Task Shutdown()
+
+    private void Shutdown()
     {
-        if (_sendTask != null)
-        {
-            await _sendTask;
-        }
         lock (_shutdownLock)
         {
             if (_socketDisposed)
