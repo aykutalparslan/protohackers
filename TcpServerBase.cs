@@ -24,33 +24,30 @@ using protohackers.Transport;
 
 namespace protohackers;
 
-public class SmokeTest : TcpServerBase
+public abstract class TcpServerBase
 {
-    protected override async Task ProcessConnection(Connection connection)
+    public async Task Start(int port)
     {
-        connection.Start();
-        while (true)
-        {
-            var result = await connection.Input.ReadAsync();
-            var buff = result.Buffer;
-            if (buff.IsSingleSegment)
-            {
-                await connection.Output.WriteAsync(buff.First);
-            }
-            else
-            {
-                foreach (var mem in buff)
-                {
-                    await connection.Output.WriteAsync(mem);
-                }
-            }
-            connection.Input.AdvanceTo(buff.End);
-            if (result.IsCompleted || result.IsCanceled)
-            {
-                break;
-            }
-        }
-
-        await connection.Output.CompleteAsync();
+        var listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        listenSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+        listenSocket.Listen(128);
+        
+        await AcceptConnections(listenSocket);
     }
+    private async Task AcceptConnections(Socket listenSocket)
+    {
+        var transportScheduler = new IOQueue();
+        var applicationScheduler = PipeScheduler.ThreadPool;
+        var senderPool = new SenderPool();
+        var memoryPool = new PinnedBlockMemoryPool();
+        while (listenSocket.IsBound)
+        {
+            var socket = await listenSocket.AcceptAsync();
+            var connection = new Connection(socket, senderPool,
+                transportScheduler, applicationScheduler, memoryPool);
+            _ = ProcessConnection(connection);
+        }
+    }
+
+    protected abstract Task ProcessConnection(Connection connection);
 }
