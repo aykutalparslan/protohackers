@@ -74,7 +74,7 @@ public class SmokeTest
             }
         }
         Console.WriteLine("Closing the connection.");
-        connection.Shutdown();
+        await connection.Shutdown();
         await connection.DisposeAsync();
     }
 }

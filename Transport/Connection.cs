@@ -139,8 +139,12 @@ public class Connection : IAsyncDisposable
             _sender?.Dispose();
         }
     }
-    public void Shutdown()
+    public async Task Shutdown()
     {
+        if (_sendTask != null)
+        {
+            await _sendTask;
+        }
         lock (_shutdownLock)
         {
             if (_socketDisposed)
@@ -150,6 +154,7 @@ public class Connection : IAsyncDisposable
             _socketDisposed = true;
             try
             {
+                
                 _socket.Close();
             }
             finally
