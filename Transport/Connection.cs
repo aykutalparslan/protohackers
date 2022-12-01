@@ -113,7 +113,6 @@ public class Connection : IAsyncDisposable
         finally
         {
             _applicationPipe.Writer.Complete();
-            Shutdown();
         }
     }
 

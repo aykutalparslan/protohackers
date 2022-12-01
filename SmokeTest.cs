@@ -73,7 +73,5 @@ public class SmokeTest
                 break;
             }
         }
-
-        await connection.Output.CompleteAsync();
     }
 }
