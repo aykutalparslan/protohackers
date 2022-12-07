@@ -55,7 +55,7 @@ public class BudgedChat : TcpServerBase
                         var message = buffer.Slice(0, 
                             buffer.GetPosition(1, position.Value));
                         await WalkConnections(username, 
-                            message.ToArray());
+                            GenerateMessage(username, message));
                     }
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
@@ -76,6 +76,15 @@ public class BudgedChat : TcpServerBase
             _users.TryRemove(username, out var reference);
             await WalkConnections(username, GenerateUserLeftMessage(username));
         }
+    }
+
+    private ReadOnlyMemory<byte> GenerateMessage(string username, ReadOnlySequence<byte> message)
+    {
+        StringBuilder sb = new StringBuilder("[");
+        sb.Append(username);
+        sb.Append("] ");
+        sb.Append(Encoding.UTF8.GetString(message));
+        return Encoding.UTF8.GetBytes(sb.ToString());
     }
 
     private ReadOnlyMemory<byte> GenerateUserJoinedMessage(string username)
