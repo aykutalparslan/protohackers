@@ -19,6 +19,7 @@
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Text;
+using System.Text.RegularExpressions;
 using protohackers.Transport;
 
 namespace protohackers;
@@ -31,7 +32,8 @@ public class BudgedChat : TcpServerBase
     {
         string? username = null;
         await connection.Output.WriteAsync(WelcomeMessage);
-        while (true)
+        bool completed = false;
+        while (!completed)
         {
             var result = await connection.Input.ReadAsync();
             ReadOnlySequence<byte> buffer = result.Buffer;
@@ -46,6 +48,11 @@ public class BudgedChat : TcpServerBase
                     {
                         var message = buffer.Slice(0, position.Value);
                         username = Encoding.UTF8.GetString(message);
+                        if (!Regex.IsMatch(username, "[^a-zA-Z0-9]"))
+                        {
+                            completed = true;
+                            break;
+                        }
                         _users.TryAdd(username, new WeakReference<Connection>(connection));
                         await connection.Output.WriteAsync(GenerateExistingUsersMessage(username));
                         await WalkConnections(username, GenerateUserJoinedMessage(username));
