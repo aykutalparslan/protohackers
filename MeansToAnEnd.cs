@@ -78,6 +78,10 @@ public class MeansToAnEnd : TcpServerBase
             var filtered = prices.GetViewBetween(
                 new TimestampedPrice(low, 0),
                 new TimestampedPrice(high, 0));
+            if (filtered == null)
+            {
+                return 0;
+            }
             int sum = 0;
             foreach (var p in filtered)
             {
