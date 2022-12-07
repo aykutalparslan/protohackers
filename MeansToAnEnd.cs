@@ -31,7 +31,7 @@ public class MeansToAnEnd : TcpServerBase
                             await connection.Output.WriteAsync(responseBuffer);
                         }
                     }
-                    catch (InvalidOperationException e)
+                    catch
                     {
                         completed = true;
                         break;
@@ -75,22 +75,26 @@ public class MeansToAnEnd : TcpServerBase
             reader.TryCopyTo(numBytes);
             int high = BinaryPrimitives.ReadInt32BigEndian(numBytes);
             Console.WriteLine($"Querying prices {low} - {high}");
-            var filtered = prices.GetViewBetween(
-                new TimestampedPrice(low, 0),
-                new TimestampedPrice(high, 0));
-            if (filtered == null)
+            try
+            {
+                var filtered = prices.GetViewBetween(
+                    new TimestampedPrice(low, 0),
+                    new TimestampedPrice(high, 0));
+                int sum = 0;
+                foreach (var p in filtered)
+                {
+                    sum += p.Price;
+                }
+
+                int median = sum / filtered.Count;
+                Console.WriteLine($"Median is {median}");
+                return median;
+            }
+            catch
             {
                 return 0;
             }
-            int sum = 0;
-            foreach (var p in filtered)
-            {
-                sum += p.Price;
-            }
-
-            int median = sum / filtered.Count;
-            Console.WriteLine($"Median is {median}");
-            return median;
+            
         }
         else
         {
