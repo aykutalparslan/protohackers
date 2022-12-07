@@ -27,7 +27,7 @@ public class MeansToAnEnd : TcpServerBase
                         BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
                         await connection.Output.WriteAsync(responseBuffer);
                     }
-                    buffer = buffer.Slice(buffer.GetPosition(10, buffer.Start));
+                    buffer = buffer.Slice(buffer.GetPosition(9, buffer.Start));
                 }
             } while (buffer.Length >= 9);
             connection.Input.AdvanceTo(buffer.Start, buffer.End);
