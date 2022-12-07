@@ -25,7 +25,7 @@ namespace protohackers;
 
 public class BudgedChat : TcpServerBase
 {
-    private static byte[] WelcomeMessage => "Welcome to budgetchat! What shall I call you?"u8.ToArray();
+    private static byte[] WelcomeMessage => "Welcome to budgetchat! What shall I call you?\n"u8.ToArray();
     private ConcurrentDictionary<string, WeakReference<Connection>> _users = new();
     protected override async Task ProcessConnection(Connection connection)
     {
