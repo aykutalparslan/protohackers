@@ -88,8 +88,12 @@ public class MeansToAnEnd : TcpServerBase
             Console.WriteLine($"Median is {median}");
             return median;
         }
+        else
+        {
+            throw new InvalidOperationException();
+        }
 
-        throw new InvalidOperationException();
+        return null;
     }
     private readonly record struct TimestampedPrice(int Timestamp, int Price);
     private class ByTimestamp : IComparer<TimestampedPrice>
