@@ -30,12 +30,9 @@ public class BudgedChat : TcpServerBase
     protected override async Task ProcessConnection(Connection connection)
     {
         string? username = null;
+        await connection.Output.WriteAsync(WelcomeMessage);
         while (true)
         {
-            if (username == null)
-            {
-                await connection.Output.WriteAsync(WelcomeMessage);
-            }
             var result = await connection.Input.ReadAsync();
             ReadOnlySequence<byte> buffer = result.Buffer;
             SequencePosition? position = null;
