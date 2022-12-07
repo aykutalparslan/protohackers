@@ -10,7 +10,8 @@ public class MeansToAnEnd : TcpServerBase
     {
         SortedSet<TimestampedPrice> prices = new SortedSet<TimestampedPrice>(new ByTimestamp());
         var responseBuffer = new byte[4];
-        while (true)
+        bool completed = false;
+        while (!completed)
         {
             var result = await connection.Input.ReadAsync();
             var buffer = result.Buffer;
@@ -20,13 +21,22 @@ public class MeansToAnEnd : TcpServerBase
                 if (buffer.Length >= 9)
                 {
                     Console.WriteLine("Processing request...");
-                    var response = ProcessRequest(buffer.Slice(0, 9), prices);
-                    if (response != null)
+                    try
                     {
-                        Console.WriteLine("Sending response...");
-                        BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
-                        await connection.Output.WriteAsync(responseBuffer);
+                        var response = ProcessRequest(buffer.Slice(0, 9), prices);
+                        if (response != null)
+                        {
+                            Console.WriteLine("Sending response...");
+                            BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
+                            await connection.Output.WriteAsync(responseBuffer);
+                        }
                     }
+                    catch (InvalidOperationException e)
+                    {
+                        completed = true;
+                        break;
+                    }
+                    
                     buffer = buffer.Slice(buffer.GetPosition(9, buffer.Start));
                 }
             } while (buffer.Length >= 9);
@@ -79,7 +89,7 @@ public class MeansToAnEnd : TcpServerBase
             return median;
         }
 
-        return null;
+        throw new InvalidOperationException();
     }
     private readonly record struct TimestampedPrice(int Timestamp, int Price);
     private class ByTimestamp : IComparer<TimestampedPrice>
