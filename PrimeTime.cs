@@ -13,7 +13,8 @@ public class PrimeTime : TcpServerBase
     private byte[] ResponseMalformed => """{"method":"isPrime"}\n"""u8.ToArray();
     protected override async Task ProcessConnection(Connection connection)
     {
-        while (true)
+        bool completed = false;
+        while (!completed)
         {
             var result = await connection.Input.ReadAsync();
             ReadOnlySequence<byte> buffer = result.Buffer;
@@ -25,6 +26,11 @@ public class PrimeTime : TcpServerBase
                 {
                     Console.WriteLine("Processing line...");
                     var response = ProcessRequest(buffer.Slice(0, position.Value));
+                    if (response == ResponseMalformed)
+                    {
+                        completed = true;
+                        break;
+                    }
                     await connection.Output.WriteAsync(response);
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
