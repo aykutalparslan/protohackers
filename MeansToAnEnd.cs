@@ -74,7 +74,9 @@ public class MeansToAnEnd : TcpServerBase
                 sum += p.Price;
             }
 
-            return sum / filtered.Count;
+            int median = sum / filtered.Count;
+            Console.WriteLine($"Median is {median}");
+            return median;
         }
 
         return null;
