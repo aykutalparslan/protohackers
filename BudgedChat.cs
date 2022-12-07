@@ -46,7 +46,7 @@ public class BudgedChat : TcpServerBase
                     {
                         username = Encoding.UTF8.GetString(message).TrimEnd('\n');
                         _users.TryAdd(username, new WeakReference<Connection>(connection));
-                        await connection.Output.WriteAsync(GenerateExistingUsersMessage());
+                        await connection.Output.WriteAsync(GenerateExistingUsersMessage(username));
                         await WalkConnections(username, GenerateUserJoinedMessage(username));
                     }
                     else
@@ -96,13 +96,13 @@ public class BudgedChat : TcpServerBase
         }
     }
 
-    private ReadOnlyMemory<byte> GenerateExistingUsersMessage()
+    private ReadOnlyMemory<byte> GenerateExistingUsersMessage(string username)
     {
         StringBuilder sb = new StringBuilder("* The room contains: ");
         bool first = true;
         foreach (var(u, r) in _users)
         {
-            if (r.TryGetTarget(out var c))
+            if (u != username && r.TryGetTarget(out var c))
             {
                 if (!first)
                 {
