@@ -11,8 +11,7 @@ public class MeansToAnEnd : TcpServerBase
     {
         SortedSet<TimestampedPrice> prices = new SortedSet<TimestampedPrice>(new ByTimestamp());
         var responseBuffer = new byte[4];
-        bool completed = false;
-        while (!completed)
+        while (true)
         {
             var result = await connection.Input.ReadAsync();
             var buffer = result.Buffer;
@@ -21,21 +20,13 @@ public class MeansToAnEnd : TcpServerBase
             {
                 if (buffer.Length >= 9)
                 {
-                    try
+                    var response = ProcessRequest(buffer.Slice(0, 9), prices);
+                    if (response != null)
                     {
-                        var response = ProcessRequest(buffer.Slice(0, 9), prices);
-                        if (response != null)
-                        {
-                            BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
-                            await connection.Output.WriteAsync(responseBuffer);
-                        }
+                        BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
+                        await connection.Output.WriteAsync(responseBuffer);
                     }
-                    catch
-                    {
-                        completed = true;
-                        break;
-                    }
-                    
+
                     buffer = buffer.Slice(buffer.GetPosition(9, buffer.Start));
                 }
             } while (buffer.Length >= 9);
@@ -91,10 +82,6 @@ public class MeansToAnEnd : TcpServerBase
                 return 0;
             }
             
-        }
-        else
-        {
-            throw new InvalidOperationException();
         }
 
         return null;
