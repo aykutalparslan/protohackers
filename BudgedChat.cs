@@ -41,16 +41,19 @@ public class BudgedChat : TcpServerBase
                 position = buffer.PositionOf((byte)'\n');
                 if (position != null)
                 {
-                    var message = buffer.Slice(0, position.Value);
+                    
                     if (username == null)
                     {
-                        username = Encoding.UTF8.GetString(message).TrimEnd('\n');
+                        var message = buffer.Slice(0, position.Value);
+                        username = Encoding.UTF8.GetString(message);
                         _users.TryAdd(username, new WeakReference<Connection>(connection));
                         await connection.Output.WriteAsync(GenerateExistingUsersMessage(username));
                         await WalkConnections(username, GenerateUserJoinedMessage(username));
                     }
                     else
                     {
+                        var message = buffer.Slice(0, 
+                            buffer.GetPosition(1, position.Value));
                         await WalkConnections(username, 
                             message.ToArray());
                     }
@@ -85,7 +88,7 @@ public class BudgedChat : TcpServerBase
         return Encoding.UTF8.GetBytes("* "+ username + " has left the room\n");
     }
 
-    private async Task WalkConnections(string username ,ReadOnlyMemory<byte> message)
+    private async Task WalkConnections(string username, ReadOnlyMemory<byte> message)
     {
         foreach (var(u, r) in _users)
         {
