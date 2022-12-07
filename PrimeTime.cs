@@ -24,7 +24,6 @@ public class PrimeTime : TcpServerBase
                 position = buffer.PositionOf((byte)'\n');
                 if (position != null)
                 {
-                    Console.WriteLine("Processing line...");
                     var response = ProcessRequest(buffer.Slice(0, position.Value));
                     if (response == ResponseMalformed)
                     {
@@ -57,10 +56,7 @@ public class PrimeTime : TcpServerBase
 
         if (isValidRequest)
         {
-            Console.WriteLine($"Request is valid with n: {n}");
-            bool isPrime = MillerRabin.IsPrime(n);
-            Console.WriteLine($"Primality: {isPrime}");
-            return isPrime ? 
+            return MillerRabin.IsPrime(n) ? 
                 ResponseTrue : 
                 ResponseFalse;
         }
