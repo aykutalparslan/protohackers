@@ -23,6 +23,7 @@ public class PrimeTime : TcpServerBase
                 position = buffer.PositionOf((byte)'\n');
                 if (position != null)
                 {
+                    Console.WriteLine("Processing line...");
                     connection.Output.Write(ProcessRequest(buffer.Slice(0, position.Value)));
                     await connection.Output.FlushAsync();
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
@@ -50,6 +51,7 @@ public class PrimeTime : TcpServerBase
 
         if (isValidRequest)
         {
+            Console.WriteLine("Request is valid...");
             return MillerRabin.IsPrime(n) ? 
                 ResponseTrue : 
                 ResponseFalse;
