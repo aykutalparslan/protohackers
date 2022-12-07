@@ -15,7 +15,7 @@ public class MeansToAnEnd : TcpServerBase
             var result = await connection.Input.ReadAsync();
             var buffer = result.Buffer;
 
-            while (buffer.Length >= 9)
+            do
             {
                 var request = buffer.Slice(0, 9);
                 var response = ProcessRequest(request, prices);
@@ -24,9 +24,9 @@ public class MeansToAnEnd : TcpServerBase
                     BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
                     await connection.Output.WriteAsync(responseBuffer);
                 }
-                
+
                 buffer = buffer.Slice(buffer.GetPosition(1, request.End));
-            }
+            } while (buffer.Length >= 9);
             connection.Input.AdvanceTo(buffer.Start, buffer.End);
 
             if (result.IsCanceled ||
