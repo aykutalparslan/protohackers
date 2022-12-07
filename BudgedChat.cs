@@ -44,8 +44,7 @@ public class BudgedChat : TcpServerBase
                     var message = buffer.Slice(0, position.Value);
                     if (username == null)
                     {
-                        username = Encoding.UTF8.GetString(
-                            message.Slice(0, message.Length - 1));
+                        username = Encoding.UTF8.GetString(message).TrimEnd('\n');
                         _users.TryAdd(username, new WeakReference<Connection>(connection));
                         await connection.Output.WriteAsync(GenerateExistingUsersMessage());
                         await WalkConnections(username, GenerateUserJoinedMessage(username));
@@ -53,7 +52,7 @@ public class BudgedChat : TcpServerBase
                     else
                     {
                         await WalkConnections(username, 
-                            message.Slice(0, message.Length - 1).ToArray());
+                            message.ToArray());
                     }
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
