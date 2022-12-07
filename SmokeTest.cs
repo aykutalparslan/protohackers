@@ -6,7 +6,6 @@ public class SmokeTest : TcpServerBase
 {
     protected override async Task ProcessConnection(Connection connection)
     {
-        connection.Start();
         while (true)
         {
             var result = await connection.Input.ReadAsync();
