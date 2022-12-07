@@ -17,15 +17,17 @@ public class MeansToAnEnd : TcpServerBase
 
             do
             {
-                var request = buffer.Slice(0, 9);
-                var response = ProcessRequest(request, prices);
-                if (response != null)
+                if (buffer.Length >= 9)
                 {
-                    BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
-                    await connection.Output.WriteAsync(responseBuffer);
+                    var request = buffer.Slice(0, 9);
+                    var response = ProcessRequest(request, prices);
+                    if (response != null)
+                    {
+                        BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
+                        await connection.Output.WriteAsync(responseBuffer);
+                    }
+                    buffer = buffer.Slice(buffer.GetPosition(1, request.End));
                 }
-
-                buffer = buffer.Slice(buffer.GetPosition(1, request.End));
             } while (buffer.Length >= 9);
             connection.Input.AdvanceTo(buffer.Start, buffer.End);
 
