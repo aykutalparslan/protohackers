@@ -52,8 +52,10 @@ public class PrimeTime : TcpServerBase
 
         if (isValidRequest)
         {
-            Console.WriteLine("Request is valid...");
-            return MillerRabin.IsPrime(n) ? 
+            Console.WriteLine($"Request is valid with n: {n}");
+            bool isPrime = MillerRabin.IsPrime(n);
+            Console.WriteLine($"Primality: {isPrime}");
+            return isPrime ? 
                 ResponseTrue : 
                 ResponseFalse;
         }
