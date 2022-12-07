@@ -20,9 +20,11 @@ public class MeansToAnEnd : TcpServerBase
                 if (buffer.Length >= 9)
                 {
                     var request = buffer.Slice(0, 9);
+                    Console.WriteLine("Processing request...");
                     var response = ProcessRequest(request, prices);
                     if (response != null)
                     {
+                        Console.WriteLine("Sending response...");
                         BinaryPrimitives.WriteInt32BigEndian(responseBuffer, response.Value);
                         await connection.Output.WriteAsync(responseBuffer);
                     }
@@ -53,6 +55,7 @@ public class MeansToAnEnd : TcpServerBase
             reader.TryCopyTo(numBytes);
             int price = BinaryPrimitives.ReadInt32BigEndian(numBytes);
             prices.Add(new TimestampedPrice(timestamp, price));
+            Console.WriteLine($"Adding price {timestamp} - {price}");
         }
         else if (q == 'Q')
         {
@@ -60,6 +63,7 @@ public class MeansToAnEnd : TcpServerBase
             int low = BinaryPrimitives.ReadInt32BigEndian(numBytes);
             reader.TryCopyTo(numBytes);
             int high = BinaryPrimitives.ReadInt32BigEndian(numBytes);
+            Console.WriteLine($"Querying prices {low} - {high}");
             var filtered = prices.GetViewBetween(
                 new TimestampedPrice(low, 0),
                 new TimestampedPrice(high, 0));
