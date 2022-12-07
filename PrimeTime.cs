@@ -13,6 +13,7 @@ public class PrimeTime : TcpServerBase
     private ReadOnlySpan<byte> ResponseMalformed => """{"method":"isPrime"}"""u8;
     protected override async Task ProcessConnection(Connection connection)
     {
+        connection.Start();
         while (true)
         {
             var result = await connection.Input.ReadAsync();
