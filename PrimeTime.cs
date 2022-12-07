@@ -8,9 +8,9 @@ namespace protohackers;
 
 public class PrimeTime : TcpServerBase
 {
-    private byte[] ResponseTrue => """{"method":"isPrime","prime":true}\n"""u8.ToArray();
-    private byte[] ResponseFalse => """{"method":"isPrime","prime":false}\n"""u8.ToArray();
-    private byte[] ResponseMalformed => """{"method":"isPrime"}\n"""u8.ToArray();
+    private byte[] ResponseTrue => "{\"method\":\"isPrime\",\"prime\":true}\n"u8.ToArray();
+    private byte[] ResponseFalse => "{\"method\":\"isPrime\",\"prime\":false}\n"u8.ToArray();
+    private byte[] ResponseMalformed => "{\"method\":\"isPrime\"}\n"u8.ToArray();
     protected override async Task ProcessConnection(Connection connection)
     {
         bool completed = false;
