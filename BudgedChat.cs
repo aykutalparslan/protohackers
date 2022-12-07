@@ -67,14 +67,15 @@ public class BudgedChat : TcpServerBase
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
             } while (position != null);
-        
-            connection.Input.AdvanceTo(buffer.Start, buffer.End);
-
+            
             if (result.IsCanceled || 
-                result.IsCompleted)
+                result.IsCompleted || 
+                completed)
             {
                 break;
             }
+            
+            connection.Input.AdvanceTo(buffer.Start, buffer.End);
         }
         
         await connection.Output.CompleteAsync();
