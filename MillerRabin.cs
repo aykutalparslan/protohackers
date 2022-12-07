@@ -13,9 +13,9 @@ public class MillerRabin
     /// <returns></returns>
     public static bool IsPrime(long n)
     {
-        if (n % 2 == 0 || n < 2)
+        if (n % 2 == 0 || n < 4)
         {
-            return n == 2;
+            return n == 2 || n == 3;
         }
         long d = n - 1;
         int s = 0;
@@ -59,9 +59,9 @@ public class MillerRabin
     /// <returns></returns>
     public static bool IsPrime(BigInteger n)
     {
-        if (n % 2 == 0 || n < 2)
+        if (n % 2 == 0 || n < 4)
         {
-            return n == 2;
+            return n == 2 || n == 3;
         }
         BigInteger d = n - 1;
         int s = 0;

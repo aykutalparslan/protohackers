@@ -1,6 +1,8 @@
 using System.Security.Cryptography;
 using protohackers;
 
+Console.WriteLine(MillerRabin.IsPrime(3));
+
 //var smokeTest = new SmokeTest();
 //await smokeTest.Start(12345);
 
