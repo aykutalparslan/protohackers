@@ -8,9 +8,9 @@ namespace protohackers;
 
 public class PrimeTime : TcpServerBase
 {
-    private ReadOnlySpan<byte> ResponseTrue => """{"method":"isPrime","prime":true}"""u8;
-    private ReadOnlySpan<byte> ResponseFalse => """{"method":"isPrime","prime":false}"""u8;
-    private ReadOnlySpan<byte> ResponseMalformed => """{"method":"isPrime"}"""u8;
+    private byte[] ResponseTrue => """{"method":"isPrime","prime":true}"""u8.ToArray();
+    private byte[] ResponseFalse => """{"method":"isPrime","prime":false}"""u8.ToArray();
+    private byte[] ResponseMalformed => """{"method":"isPrime"}"""u8.ToArray();
     protected override async Task ProcessConnection(Connection connection)
     {
         connection.Start();
@@ -25,8 +25,8 @@ public class PrimeTime : TcpServerBase
                 if (position != null)
                 {
                     Console.WriteLine("Processing line...");
-                    connection.Output.Write(ProcessRequest(buffer.Slice(0, position.Value)));
-                    await connection.Output.FlushAsync();
+                    var response = ProcessRequest(buffer.Slice(0, position.Value));
+                    await connection.Output.WriteAsync(response);
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
             } while (position != null);
@@ -43,7 +43,7 @@ public class PrimeTime : TcpServerBase
         await connection.Output.CompleteAsync();
     }
 
-    private ReadOnlySpan<byte> ProcessRequest(ReadOnlySequence<byte> line)
+    private byte[] ProcessRequest(ReadOnlySequence<byte> line)
     {
         BigInteger n = 0;
         bool isValidRequest = line.IsSingleSegment ? 
