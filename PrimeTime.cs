@@ -37,7 +37,7 @@ public class PrimeTime : TcpServerBase
                 break;
             }
         }
-        connection.Input.Complete();
+        
         await connection.Output.CompleteAsync();
     }
 
