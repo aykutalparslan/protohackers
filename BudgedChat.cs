@@ -48,7 +48,7 @@ public class BudgedChat : TcpServerBase
                     {
                         var message = buffer.Slice(0, position.Value);
                         username = Encoding.UTF8.GetString(message);
-                        if (!Regex.IsMatch(username, "[^a-zA-Z0-9]"))
+                        if (!Regex.IsMatch(username, "^[a-zA-Z0-9]*$"))
                         {
                             completed = true;
                             break;
