@@ -10,5 +10,8 @@ using protohackers;
 //var meansToAnEnd = new MeansToAnEnd();
 //await meansToAnEnd.Start(12345);
 
-var budgetChat = new BudgedChat();
-await budgetChat.Start(12345);
+//var budgetChat = new BudgedChat();
+//await budgetChat.Start(12345);
+
+var unusualDatabase = new UnusualDatabaseProgram();
+await unusualDatabase.Start(12345);
