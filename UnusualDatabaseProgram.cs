@@ -26,13 +26,16 @@ public class UnusualDatabaseProgram : UdpServerBase
             }
         }
 
-        if (data.SequenceEqual(Version))
+        if (data.SequenceEqual("version"u8.ToArray()))
         {
-            
+            await SendAsync(Version, endPoint);
         }
-        else if (pos == -1 && _data.TryGetValue(data, out var value))
+        else if (pos == -1)
         {
-            await SendAsync(value, endPoint);
+            if (_data.TryGetValue(data, out var value))
+            {
+                await SendAsync(value, endPoint);
+            }
         }
         else if (pos == 0)
         {
