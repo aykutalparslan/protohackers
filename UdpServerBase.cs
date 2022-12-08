@@ -20,6 +20,7 @@ public abstract class UdpServerBase
 
     protected async ValueTask<int> SendAsync(ReadOnlyMemory<byte> datagram, IPEndPoint endPoint)
     {
+        Console.WriteLine("Sending datagram...");
         if (_client != null) return await _client.SendAsync(datagram, endPoint);
         return 0;
     }
