@@ -39,15 +39,18 @@ public class UnusualDatabaseProgram : UdpServerBase
         }
         else if (pos == 0)
         {
-            _data.TryAdd(Array.Empty<byte>(), data[1..]);
+            _data.AddOrUpdate(Array.Empty<byte>(), data[1..],
+                (key, oldValue) => data[1..]);
         }
         else if(pos == data.Length - 1)
         {
-            _data.TryAdd(data[..^1], Array.Empty<byte>());
+            _data.AddOrUpdate(data[..^1], Array.Empty<byte>(),
+                (key, oldValue) => Array.Empty<byte>());
         }
         else
         {
-            _data.TryAdd(data[..pos], data[(pos + 1)..]);
+            _data.AddOrUpdate(data[..pos], data[(pos + 1)..],
+                (key, oldValue) => data[(pos + 1)..]);
         }
     }
     private class ArrayComparer : IEqualityComparer<byte[]>
