@@ -42,8 +42,8 @@ public class UnusualDatabaseProgram : UdpServerBase
         {
             if (data.Length == 1)
             {
-                _data.AddOrUpdate(Empty, Empty,
-                    (key, oldValue) => Empty);
+                _data.AddOrUpdate(Empty, Array.Empty<byte>(),
+                    (key, oldValue) => Array.Empty<byte>());
             }
             else
             {
@@ -53,8 +53,8 @@ public class UnusualDatabaseProgram : UdpServerBase
         }
         else if(pos == data.Length - 1)
         {
-            _data.AddOrUpdate(data[..^1], Empty,
-                (key, oldValue) => Empty);
+            _data.AddOrUpdate(data[..^1], Array.Empty<byte>(),
+                (key, oldValue) => Array.Empty<byte>());
         }
         else
         {
