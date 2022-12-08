@@ -30,13 +30,13 @@ public class UnusualDatabaseProgram : UdpServerBase
         if (data.SequenceEqual("version"u8.ToArray()))
         {
             Console.WriteLine("--> version");
-            await SendAsync(Version, endPoint);
+            await SendAsync("version"u8.ToArray().Concat(Version).ToArray(), endPoint);
         }
         else if (pos == -1)
         {
             if (_data.TryGetValue(data, out var value))
             {
-                await SendAsync(value, endPoint);
+                await SendAsync(data.Concat(new[] { (byte)'=' }).Concat(value).ToArray(), endPoint);
             }
         }
         else if (pos == 0)

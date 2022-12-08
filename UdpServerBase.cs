@@ -7,6 +7,8 @@ namespace protohackers;
 public abstract class UdpServerBase
 {
     private UdpClient? _client;
+    private Socket _sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
+        ProtocolType.Udp);
     public async Task Start(int port)
     {
         var endPoint = new IPEndPoint(IPAddress.Any, port);
@@ -21,12 +23,9 @@ public abstract class UdpServerBase
 
     protected async ValueTask<int> SendAsync(ReadOnlyMemory<byte> datagram, IPEndPoint endPoint)
     {
-        Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
-            ProtocolType.Udp);
-        
         Console.WriteLine($"---");
         Console.WriteLine($"{Encoding.UTF8.GetString(datagram.Span)}");
         Console.WriteLine($"Sending datagram to {endPoint.Address} - {endPoint.Port}");
-        return await sender.SendToAsync(datagram , endPoint);
+        return await _sender.SendToAsync(datagram , endPoint);
     }
 }
