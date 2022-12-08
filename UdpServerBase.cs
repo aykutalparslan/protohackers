@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace protohackers;
 
@@ -21,7 +22,9 @@ public abstract class UdpServerBase
     protected async ValueTask<int> SendAsync(ReadOnlyMemory<byte> datagram, IPEndPoint endPoint)
     {
         var sender = new UdpClient();
-        Console.WriteLine("Sending datagram...");
+        Console.WriteLine($"---");
+        Console.WriteLine($"{Encoding.UTF8.GetString(datagram.Span)}");
+        Console.WriteLine($"Sending datagram to {endPoint.Address} - {endPoint.Port}");
         return await sender.SendAsync(datagram, endPoint);
     }
 }
