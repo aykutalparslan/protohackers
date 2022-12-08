@@ -39,8 +39,16 @@ public class UnusualDatabaseProgram : UdpServerBase
         }
         else if (pos == 0)
         {
-            _data.AddOrUpdate(Array.Empty<byte>(), data[1..],
-                (key, oldValue) => data[1..]);
+            if (data.Length == 1)
+            {
+                _data.AddOrUpdate(Array.Empty<byte>(), Array.Empty<byte>(),
+                    (key, oldValue) => Array.Empty<byte>());
+            }
+            else
+            {
+                _data.AddOrUpdate(Array.Empty<byte>(), data[1..],
+                    (key, oldValue) => data[1..]);
+            }
         }
         else if(pos == data.Length - 1)
         {
