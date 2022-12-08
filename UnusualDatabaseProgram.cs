@@ -32,6 +32,13 @@ public class UnusualDatabaseProgram : UdpServerBase
         {
             await SendAsync(Version, endPoint);
         }
+        else if(data.Length == 0)
+        {
+            if (_data.TryGetValue(EmptyKey, out var value))
+            {
+                await SendAsync(EmptyKey.Concat(new[] { (byte)'=' }).Concat(value).ToArray(), endPoint);
+            }
+        }
         else if (pos == -1)
         {
             if (_data.TryGetValue(data, out var value))
@@ -48,16 +55,8 @@ public class UnusualDatabaseProgram : UdpServerBase
             }
             else
             {
-                try
-                {
-                    _data.AddOrUpdate(EmptyKey, data[1..],
+                _data.AddOrUpdate(EmptyKey, data[1..],
                         (key, oldValue) => data[1..]);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(Encoding.UTF8.GetString(data));
-                }
-                
             }
         }
         else if(pos == data.Length - 1)
