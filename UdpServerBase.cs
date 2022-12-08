@@ -21,10 +21,12 @@ public abstract class UdpServerBase
 
     protected async ValueTask<int> SendAsync(ReadOnlyMemory<byte> datagram, IPEndPoint endPoint)
     {
-        var sender = new UdpClient();
+        Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
+            ProtocolType.Udp);
+        
         Console.WriteLine($"---");
         Console.WriteLine($"{Encoding.UTF8.GetString(datagram.Span)}");
         Console.WriteLine($"Sending datagram to {endPoint.Address} - {endPoint.Port}");
-        return await sender.SendAsync(datagram, endPoint);
+        return await sender.SendToAsync(datagram , endPoint);
     }
 }
