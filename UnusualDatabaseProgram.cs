@@ -36,7 +36,7 @@ public class UnusualDatabaseProgram : UdpServerBase
         {
             if (_data.TryGetValue(EmptyKey, out var value))
             {
-                await SendAsync(EmptyKey.Concat(new[] { (byte)'=' }).Concat(value).ToArray(), endPoint);
+                await SendAsync(Array.Empty<byte>().Concat(new[] { (byte)'=' }).Concat(value).ToArray(), endPoint);
             }
         }
         else if (pos == -1)
