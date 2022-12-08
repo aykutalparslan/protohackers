@@ -8,6 +8,7 @@ public class UnusualDatabaseProgram : UdpServerBase
 {
     private readonly ConcurrentDictionary<byte[], byte[]> _data = new(new ArrayComparer());
     private byte[] Version => "version=Ken's Key-Value Store 1.0"u8.ToArray();
+    private byte[] Empty => "==="u8.ToArray();
     protected override async Task ProcessDatagram(byte[] data, IPEndPoint endPoint)
     {
         if(data.Length > 1000) return;
@@ -41,19 +42,19 @@ public class UnusualDatabaseProgram : UdpServerBase
         {
             if (data.Length == 1)
             {
-                _data.AddOrUpdate(Array.Empty<byte>(), Array.Empty<byte>(),
-                    (key, oldValue) => Array.Empty<byte>());
+                _data.AddOrUpdate(Empty, Empty,
+                    (key, oldValue) => Empty);
             }
             else
             {
-                _data.AddOrUpdate(Array.Empty<byte>(), data[1..],
+                _data.AddOrUpdate(Empty, data[1..],
                     (key, oldValue) => data[1..]);
             }
         }
         else if(pos == data.Length - 1)
         {
-            _data.AddOrUpdate(data[..^1], Array.Empty<byte>(),
-                (key, oldValue) => Array.Empty<byte>());
+            _data.AddOrUpdate(data[..^1], Empty,
+                (key, oldValue) => Empty);
         }
         else
         {
