@@ -74,6 +74,10 @@ public class Connection : IAsyncDisposable
                 }
             }
         }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
         finally
         {
             _applicationPipe.Writer.Complete();
@@ -99,6 +103,10 @@ public class Connection : IAsyncDisposable
                     break;
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
         }
         finally
         {
