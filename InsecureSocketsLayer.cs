@@ -19,9 +19,11 @@ public class InsecureSocketsLayer : TcpServerBase
             if (cipher == null)
             {
                 position = buffer.PositionOf((byte)0);
+                Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                 if (position != null)
                 {
-                    cipher = new CipherSpec(buffer.Slice(0, position.Value).ToArray());
+                    var spec = buffer.Slice(0, position.Value).ToArray();
+                    cipher = new CipherSpec(spec);
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                     Console.WriteLine("Got cipher...");
                 }
@@ -54,7 +56,15 @@ public class InsecureSocketsLayer : TcpServerBase
                 decrypted.Reader.AdvanceTo(decryptedBuffer.Start, decryptedBuffer.End);
             }
 
-            connection.Input.AdvanceTo(buffer.End);
+            if (cipher != null)
+            {
+                connection.Input.AdvanceTo(buffer.End);
+            }
+            else
+            {
+                connection.Input.AdvanceTo(buffer.Start, buffer.End);
+            }
+            
 
             if (result.IsCanceled || 
                 result.IsCompleted)
