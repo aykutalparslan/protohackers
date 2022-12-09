@@ -152,6 +152,7 @@ public class Connection : IAsyncDisposable
             }
             finally
             {
+                _socket.Close();
                 _socket.Dispose();
             }
         }
