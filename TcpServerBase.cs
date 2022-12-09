@@ -27,7 +27,15 @@ public abstract class TcpServerBase
             var socket = await listenSocket.AcceptAsync();
             var connection = new Connection(socket, senderPool,
                 transportScheduler, applicationScheduler, memoryPool);
-            connection.Start();
+            try
+            {
+                connection.Start();
+            }
+            catch
+            {
+                // ignored
+            }
+
             _ = ProcessConnection(connection);
         }
     }
