@@ -81,8 +81,8 @@ public class InsecureSocketsLayer : TcpServerBase
     {
         var cipher = new CipherSpec(spec);
         var data = new byte[32];
-        var data2 = data.ToArray();
         Random.Shared.NextBytes(data);
+        var data2 = data.ToArray();
         cipher.Encode(data);
         return data.SequenceEqual(data2);
     }
