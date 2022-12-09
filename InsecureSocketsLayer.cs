@@ -23,7 +23,7 @@ public class InsecureSocketsLayer : TcpServerBase
                 if (position != null)
                 {
                     Console.WriteLine("Creating cipher...");
-                    var spec = buffer.Slice(0, position.Value).ToArray();
+                    var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
                     cipher = new CipherSpec(spec);
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
