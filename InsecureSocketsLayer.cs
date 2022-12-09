@@ -14,67 +14,69 @@ public class InsecureSocketsLayer : TcpServerBase
         try
         {
             while (true)
-        {
-            var result = await connection.Input.ReadAsync();
-            ReadOnlySequence<byte> buffer = result.Buffer;
-            SequencePosition? position = null;
-            
-            if (cipher == null && buffer.Length > 0)
             {
-                position = buffer.PositionOf((byte)0);
-                if (position != null)
+                var result = await connection.Input.ReadAsync();
+                ReadOnlySequence<byte> buffer = result.Buffer;
+                SequencePosition? position = null;
+
+                if (cipher == null && buffer.Length > 0)
                 {
-                    var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
-                    if (IsNoOpCipher(spec) || spec.Length == 1)
+                    position = buffer.PositionOf((byte)0);
+                    if (position != null)
                     {
-                        Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
-                        break;
+                        var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
+                        if (IsNoOpCipher(spec) || spec.Length == 1)
+                        {
+                            Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
+                            break;
+                        }
+
+                        cipher = new CipherSpec(spec);
+                        buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                     }
-                    cipher = new CipherSpec(spec);
-                    buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+                }
+
+                if (cipher != null && buffer.Length > 0)
+                {
+                    var data = buffer.ToArray();
+                    cipher.Decode(data);
+                    await decrypted.Writer.WriteAsync(data);
+
+                    var decryptedResult = await decrypted.Reader.ReadAsync();
+                    ReadOnlySequence<byte> decryptedBuffer = decryptedResult.Buffer;
+                    SequencePosition? decryptedPosition = null;
+                    do
+                    {
+                        decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
+                        if (decryptedPosition != null)
+                        {
+                            var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
+                            cipher.Encode(response);
+                            await connection.Output.WriteAsync(response);
+                            decryptedBuffer =
+                                decryptedBuffer.Slice(decryptedBuffer.GetPosition(1, decryptedPosition.Value));
+                        }
+                    } while (decryptedPosition != null);
+
+                    decrypted.Reader.AdvanceTo(decryptedBuffer.Start, decryptedBuffer.End);
+                }
+
+                if (cipher != null)
+                {
+                    connection.Input.AdvanceTo(buffer.End);
+                }
+                else
+                {
+                    connection.Input.AdvanceTo(buffer.Start, buffer.End);
+                }
+
+
+                if (result.IsCanceled ||
+                    result.IsCompleted)
+                {
+                    break;
                 }
             }
-
-            if (cipher != null && buffer.Length > 0)
-            {
-                var data = buffer.ToArray();
-                cipher.Decode(data);
-                await decrypted.Writer.WriteAsync(data);
-                
-                var decryptedResult = await decrypted.Reader.ReadAsync();
-                ReadOnlySequence<byte> decryptedBuffer = decryptedResult.Buffer;
-                SequencePosition? decryptedPosition = null;
-                do
-                {
-                    decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
-                    if (decryptedPosition != null)
-                    {
-                        var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
-                        cipher.Encode(response);
-                        await connection.Output.WriteAsync(response);
-                        decryptedBuffer = decryptedBuffer.Slice(decryptedBuffer.GetPosition(1, decryptedPosition.Value));
-                    }
-                } while (decryptedPosition != null);
-                
-                decrypted.Reader.AdvanceTo(decryptedBuffer.Start, decryptedBuffer.End);
-            }
-
-            if (cipher != null)
-            {
-                connection.Input.AdvanceTo(buffer.End);
-            }
-            else
-            {
-                connection.Input.AdvanceTo(buffer.Start, buffer.End);
-            }
-            
-
-            if (result.IsCanceled || 
-                result.IsCompleted)
-            {
-                break;
-            }
-        }
         }
         catch
         {
