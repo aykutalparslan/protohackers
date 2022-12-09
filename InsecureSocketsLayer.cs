@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.IO.Pipelines;
+using System.Text;
 using protohackers.Transport;
 
 namespace protohackers;
@@ -46,6 +47,7 @@ public class InsecureSocketsLayer : TcpServerBase
                     {
                         Console.WriteLine("Processing...");
                         var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
+                        Console.WriteLine(Encoding.UTF8.GetString(response));
                         cipher.Encode(response);
                         await connection.Output.WriteAsync(response);
                         Console.WriteLine("Data sent...");
@@ -112,11 +114,11 @@ public class InsecureSocketsLayer : TcpServerBase
         if (reader.TryReadTo(out ReadOnlySpan<byte> toy, 
                 ","u8, false))
         {
-            return toy.ToArray();
+            return toy.ToArray().Concat("\n"u8.ToArray()).ToArray();
         }
         else
         {
-            return reader.UnreadSequence.ToArray();
+            return reader.UnreadSequence.ToArray().Concat("\n"u8.ToArray()).ToArray();
         }
     }
 
