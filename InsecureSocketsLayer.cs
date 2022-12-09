@@ -80,6 +80,7 @@ public class InsecureSocketsLayer : TcpServerBase
 
     private byte[] ProcessRequest(ReadOnlySequence<byte> request)
     {
+        Console.WriteLine(Encoding.UTF8.GetString(request));
         List<int> requestedCount = new();
         SequenceReader<byte> reader = new SequenceReader<byte>(request);
         do
