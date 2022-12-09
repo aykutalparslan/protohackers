@@ -137,7 +137,7 @@ public class Connection : IAsyncDisposable
         }
     }
 
-    private void Shutdown()
+    public void Shutdown()
     {
         lock (_shutdownLock)
         {
