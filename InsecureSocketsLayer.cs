@@ -23,6 +23,7 @@ public class InsecureSocketsLayer : TcpServerBase
                 {
                     cipher = new CipherSpec(buffer.Slice(0, position.Value).ToArray());
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+                    Console.WriteLine("Got cipher...");
                 }
             }
 
@@ -31,22 +32,27 @@ public class InsecureSocketsLayer : TcpServerBase
                 var data = buffer.ToArray();
                 cipher.Decode(data);
                 await decrypted.Writer.WriteAsync(data);
-            }
-            
-            var decryptedResult = await decrypted.Reader.ReadAsync();
-            ReadOnlySequence<byte> decryptedBuffer = decryptedResult.Buffer;
-            SequencePosition? decryptedPosition = null;
-            do
-            {
-                decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
-                if (decryptedPosition != null)
+                Console.WriteLine("Decrypted data...");
+                
+                var decryptedResult = await decrypted.Reader.ReadAsync();
+                ReadOnlySequence<byte> decryptedBuffer = decryptedResult.Buffer;
+                SequencePosition? decryptedPosition = null;
+                do
                 {
-                    var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
-                    cipher!.Encode(response);
-                    await connection.Output.WriteAsync(response);
-                    decryptedBuffer = decryptedBuffer.Slice(decryptedBuffer.GetPosition(1, decryptedPosition.Value));
-                }
-            } while (decryptedPosition != null);
+                    decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
+                    if (decryptedPosition != null)
+                    {
+                        Console.WriteLine("Processing...");
+                        var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
+                        cipher.Encode(response);
+                        await connection.Output.WriteAsync(response);
+                        Console.WriteLine("Data sent...");
+                        decryptedBuffer = decryptedBuffer.Slice(decryptedBuffer.GetPosition(1, decryptedPosition.Value));
+                    }
+                } while (decryptedPosition != null);
+                
+                decrypted.Reader.AdvanceTo(decryptedBuffer.Start, decryptedBuffer.End);
+            }
 
             connection.Input.AdvanceTo(buffer.End);
 
