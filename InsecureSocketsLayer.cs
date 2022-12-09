@@ -16,6 +16,10 @@ public class InsecureSocketsLayer : TcpServerBase
             while (true)
             {
                 var result = await connection.Input.ReadAsync();
+                if (result.IsCanceled)
+                {
+                    break;
+                }
                 ReadOnlySequence<byte> buffer = result.Buffer;
                 SequencePosition? position = null;
 
