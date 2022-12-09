@@ -25,18 +25,18 @@ public abstract class TcpServerBase
         while (listenSocket.IsBound)
         {
             var socket = await listenSocket.AcceptAsync();
-            var connection = new Connection(socket, senderPool,
-                transportScheduler, applicationScheduler, memoryPool);
+            
             try
             {
+                var connection = new Connection(socket, senderPool,
+                    transportScheduler, applicationScheduler, memoryPool);
                 connection.Start();
+                _ = ProcessConnection(connection);
             }
             catch
             {
                 // ignored
             }
-
-            _ = ProcessConnection(connection);
         }
     }
 
