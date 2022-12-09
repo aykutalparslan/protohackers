@@ -23,8 +23,11 @@ public class InsecureSocketsLayer : TcpServerBase
                 Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                 if (position != null)
                 {
-                    Console.WriteLine("Creating cipher...");
                     var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
+                    if (IsNoOpCipher(spec))
+                    {
+                        break;
+                    }
                     cipher = new CipherSpec(spec);
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
@@ -35,7 +38,6 @@ public class InsecureSocketsLayer : TcpServerBase
                 var data = buffer.ToArray();
                 cipher.Decode(data);
                 await decrypted.Writer.WriteAsync(data);
-                Console.WriteLine("Decrypted data...");
                 
                 var decryptedResult = await decrypted.Reader.ReadAsync();
                 ReadOnlySequence<byte> decryptedBuffer = decryptedResult.Buffer;
@@ -45,12 +47,9 @@ public class InsecureSocketsLayer : TcpServerBase
                     decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
                     if (decryptedPosition != null)
                     {
-                        Console.WriteLine("Processing...");
                         var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
-                        Console.WriteLine(Encoding.UTF8.GetString(response));
                         cipher.Encode(response);
                         await connection.Output.WriteAsync(response);
-                        Console.WriteLine("Data sent...");
                         decryptedBuffer = decryptedBuffer.Slice(decryptedBuffer.GetPosition(1, decryptedPosition.Value));
                     }
                 } while (decryptedPosition != null);
@@ -78,9 +77,18 @@ public class InsecureSocketsLayer : TcpServerBase
         await connection.Output.CompleteAsync();
     }
 
+    private bool IsNoOpCipher(byte[] spec)
+    {
+        var cipher = new CipherSpec(spec);
+        var data = new byte[32];
+        var data2 = data.ToArray();
+        Random.Shared.NextBytes(data);
+        cipher.Encode(data);
+        return data.SequenceEqual(data2);
+    }
+
     private byte[] ProcessRequest(ReadOnlySequence<byte> request)
     {
-        Console.WriteLine(Encoding.UTF8.GetString(request));
         List<int> requestedCount = new();
         SequenceReader<byte> reader = new SequenceReader<byte>(request);
         do
@@ -92,7 +100,6 @@ public class InsecureSocketsLayer : TcpServerBase
                 count *= 10;
                 count += seq[i] - 48;
             }
-            Console.WriteLine("--> "+count);
             requestedCount.Add(count);
         } while (reader.TryAdvanceTo((byte)','));
         
@@ -111,7 +118,6 @@ public class InsecureSocketsLayer : TcpServerBase
         for (int i = 0; i < pos; i++)
         {
             reader.TryAdvanceTo((byte)',');
-            Console.WriteLine("* "+reader.Consumed);
         }
 
         if (reader.TryReadTo(out ReadOnlySpan<byte> toy, 
@@ -119,10 +125,7 @@ public class InsecureSocketsLayer : TcpServerBase
         {
             return toy.ToArray().Concat("\n"u8.ToArray()).ToArray();
         }
-        else
-        {
-            return reader.UnreadSequence.ToArray().Concat("\n"u8.ToArray()).ToArray();
-        }
+        return reader.UnreadSequence.ToArray().Concat("\n"u8.ToArray()).ToArray();
     }
 
     private class CipherSpec
