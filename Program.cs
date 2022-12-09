@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using protohackers;
 
@@ -13,5 +14,8 @@ using protohackers;
 //var budgetChat = new BudgedChat();
 //await budgetChat.Start(12345);
 
-var unusualDatabase = new UnusualDatabaseProgram();
-await unusualDatabase.Start(12345);
+//var unusualDatabase = new UnusualDatabaseProgram();
+//await unusualDatabase.Start(12345);
+
+var insecureSockets = new InsecureSocketsLayer();
+await insecureSockets.Start(12345);
