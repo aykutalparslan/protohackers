@@ -25,9 +25,17 @@ public class AwaitableEventArgs : SocketAsyncEventArgs, IValueTaskSource<int>
 
     public int GetResult(short token)
     {
-        int result = _source.GetResult(token);
-        _source.Reset();
-        return result;
+        try
+        {
+            int result = _source.GetResult(token);
+            _source.Reset();
+            return result;
+        }
+        catch
+        {
+            return 0;
+        }
+        
     }
 
     public ValueTaskSourceStatus GetStatus(short token)

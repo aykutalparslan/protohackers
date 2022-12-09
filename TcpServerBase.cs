@@ -10,21 +10,11 @@ public abstract class TcpServerBase
 {
     public async Task Start(int port)
     {
-        while (true)
-        {
-            try
-            {
-                var listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                listenSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-                listenSocket.Listen(128);
+        var listenSocket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        listenSocket.Bind(new IPEndPoint(IPAddress.Any, port));
+        listenSocket.Listen(128);
         
-                await AcceptConnections(listenSocket);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
+        await AcceptConnections(listenSocket);
     }
     private async Task AcceptConnections(Socket listenSocket)
     {
