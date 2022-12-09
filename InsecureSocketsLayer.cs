@@ -17,7 +17,7 @@ public class InsecureSocketsLayer : TcpServerBase
             ReadOnlySequence<byte> buffer = result.Buffer;
             SequencePosition? position = null;
             
-            if (cipher == null)
+            if (cipher == null && buffer.Length > 0)
             {
                 position = buffer.PositionOf((byte)0);
                 if (position != null)
