@@ -81,14 +81,12 @@ public class InsecureSocketsLayer : TcpServerBase
                     break;
                 }
             }
+            await connection.Output.CompleteAsync();
         }
         catch
         {
             // ignored
         }
-
-
-        await connection.Output.CompleteAsync();
     }
 
     private bool IsNoOpCipher(byte[] spec)
