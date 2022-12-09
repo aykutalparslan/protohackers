@@ -148,8 +148,7 @@ public class Connection : IAsyncDisposable
             _socketDisposed = true;
             try
             {
-                
-                _socket.Close();
+                _socket.Shutdown(SocketShutdown.Both);
             }
             finally
             {
