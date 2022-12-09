@@ -15,12 +15,19 @@ public class AwaitableEventArgs : SocketAsyncEventArgs, IValueTaskSource<int>
 
     protected override void OnCompleted(SocketAsyncEventArgs args)
     {
-        if (SocketError != SocketError.Success)
+        try
         {
-            _source.SetException(new SocketException((int)SocketError));
-        }
+            if (SocketError != SocketError.Success)
+            {
+                _source.SetException(new SocketException((int)SocketError));
+            }
 
-        _source.SetResult(BytesTransferred);
+            _source.SetResult(BytesTransferred);
+        }
+        catch
+        {
+            // ignored
+        }
     }
 
     public int GetResult(short token)
