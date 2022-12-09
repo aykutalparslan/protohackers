@@ -20,12 +20,12 @@ public class InsecureSocketsLayer : TcpServerBase
             if (cipher == null)
             {
                 position = buffer.PositionOf((byte)0);
-                Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                 if (position != null)
                 {
                     var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
                     if (IsNoOpCipher(spec))
                     {
+                        Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                         break;
                     }
                     cipher = new CipherSpec(spec);
