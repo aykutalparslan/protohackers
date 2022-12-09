@@ -32,6 +32,7 @@ public class InsecureSocketsLayer : TcpServerBase
                     if (IsNoOpCipher(spec) || spec.Length == 1)
                     {
                         Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
+                        await connection.DisposeAsync();
                         break;
                     }
 
