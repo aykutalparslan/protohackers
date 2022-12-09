@@ -110,7 +110,8 @@ public class InsecureSocketsLayer : TcpServerBase
 
         for (int i = 0; i < pos; i++)
         {
-            reader.AdvancePast((byte)',');
+            reader.TryAdvanceTo((byte)',');
+            Console.WriteLine("* "+reader.Consumed);
         }
 
         if (reader.TryReadTo(out ReadOnlySpan<byte> toy, 
