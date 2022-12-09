@@ -74,9 +74,10 @@ public class Connection : IAsyncDisposable
                 }
             }
         }
-        catch
+        catch (Exception e)
         {
-            // ignored
+            Console.WriteLine(e);
+            throw;
         }
         finally
         {
@@ -104,9 +105,10 @@ public class Connection : IAsyncDisposable
                 }
             }
         }
-        catch
+        catch (Exception e)
         {
-            // ignored
+            Console.WriteLine(e);
+            throw;
         }
         finally
         {

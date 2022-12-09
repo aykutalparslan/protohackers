@@ -19,15 +19,8 @@ public class AwaitableEventArgs : SocketAsyncEventArgs, IValueTaskSource<int>
         {
             _source.SetException(new SocketException((int)SocketError));
         }
-
-        try
-        {
-            _source.SetResult(BytesTransferred);
-        }
-        catch
-        {
-            // ignored
-        }
+        
+        _source.SetResult(BytesTransferred);
     }
 
     public int GetResult(short token)
