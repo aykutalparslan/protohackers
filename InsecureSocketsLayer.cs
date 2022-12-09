@@ -11,7 +11,9 @@ public class InsecureSocketsLayer : TcpServerBase
     {
         CipherSpec? cipher = null;
         Pipe decrypted = new Pipe();
-        while (true)
+        try
+        {
+            while (true)
         {
             var result = await connection.Input.ReadAsync();
             ReadOnlySequence<byte> buffer = result.Buffer;
@@ -73,7 +75,13 @@ public class InsecureSocketsLayer : TcpServerBase
                 break;
             }
         }
-        
+        }
+        catch
+        {
+            // ignored
+        }
+
+
         await connection.Output.CompleteAsync();
     }
 
