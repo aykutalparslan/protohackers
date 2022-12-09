@@ -41,10 +41,10 @@ public class InsecureSocketsLayer : TcpServerBase
                 decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
                 if (decryptedPosition != null)
                 {
-                    var response = ProcessRequest(buffer.Slice(0, decryptedPosition.Value));
+                    var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
                     cipher!.Encode(response);
                     await connection.Output.WriteAsync(response);
-                    buffer = buffer.Slice(buffer.GetPosition(1, decryptedPosition.Value));
+                    decryptedBuffer = decryptedBuffer.Slice(decryptedBuffer.GetPosition(1, decryptedPosition.Value));
                 }
             } while (decryptedPosition != null);
 
