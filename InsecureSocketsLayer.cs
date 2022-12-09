@@ -23,7 +23,7 @@ public class InsecureSocketsLayer : TcpServerBase
                 if (position != null)
                 {
                     var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
-                    if (IsNoOpCipher(spec))
+                    if (IsNoOpCipher(spec) || spec.Length == 1)
                     {
                         Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                         break;
