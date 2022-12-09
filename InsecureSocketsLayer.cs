@@ -92,6 +92,7 @@ public class InsecureSocketsLayer : TcpServerBase
                 count *= 10;
                 count += seq[i] - 48;
             }
+            Console.WriteLine("--> "+count);
             requestedCount.Add(count);
         } while (reader.TryAdvanceTo((byte)','));
         
