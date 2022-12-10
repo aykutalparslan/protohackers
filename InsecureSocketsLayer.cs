@@ -39,7 +39,6 @@ public class InsecureSocketsLayer : TcpServerBase
                     }
 
                     cipher = new CipherSpec(specArr);
-                    buffer = buffer.Slice(buffer.GetPosition(1, spec.End));
                 }
             }
 
