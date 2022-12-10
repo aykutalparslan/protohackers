@@ -33,9 +33,9 @@ public abstract class TcpServerBase
                 connection.Start();
                 _ = ProcessConnection(connection);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Console.WriteLine(e.Message);
             }
         }
     }

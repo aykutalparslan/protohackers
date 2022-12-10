@@ -21,23 +21,24 @@ public class InsecureSocketsLayer : TcpServerBase
             }
 
             ReadOnlySequence<byte> buffer = result.Buffer;
-            SequencePosition? position = null;
+            int specLength = 0;
 
             if (cipher == null && buffer.Length > 0)
             {
-                position = buffer.PositionOf((byte)0);
-                if (position != null)
+                specLength = GetSpecLength(buffer);
+                
+                if (specLength > 0)
                 {
-                    var spec = buffer.Slice(0, buffer.GetPosition(1, position.Value)).ToArray();
-                    if (IsNoOpCipher(spec) || spec.Length == 1)
+                    var spec = buffer.Slice(0, specLength);
+                    var specArr = spec.ToArray();
+                    if (IsNoOpCipher(specArr) || spec.Length == 1)
                     {
-                        Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                         connection.Shutdown();
                         break;
                     }
 
-                    cipher = new CipherSpec(spec);
-                    buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+                    cipher = new CipherSpec(specArr);
+                    buffer = buffer.Slice(spec.End);
                 }
             }
 
@@ -83,6 +84,26 @@ public class InsecureSocketsLayer : TcpServerBase
             }
         }
         connection.Output.Complete();
+    }
+
+    private int GetSpecLength(ReadOnlySequence<byte> buffer)
+    {
+        SequenceReader<byte> reader = new(buffer);
+        byte prev = Byte.MaxValue;
+        bool found = false;
+        while (reader.UnreadSequence.Length > 0)
+        {
+            reader.TryRead(out var b);
+            if (b == 0 && prev != 2 && prev != 4)
+            {
+                found = true;
+                break;
+            }
+
+            prev = b;
+        }
+
+        return (int)(found ? reader.Consumed: 0);
     }
 
     private bool IsNoOpCipher(byte[] spec)
