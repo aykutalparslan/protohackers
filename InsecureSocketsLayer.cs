@@ -31,9 +31,9 @@ public class InsecureSocketsLayer : TcpServerBase
                 {
                     var spec = buffer.Slice(0, specLength);
                     var specArr = spec.ToArray();
+                    Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                     if (IsNoOpCipher(specArr) || spec.Length == 1)
                     {
-                        Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                         connection.Shutdown();
                         break;
                     }
