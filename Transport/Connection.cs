@@ -80,7 +80,7 @@ public class Connection : IAsyncDisposable
         }
         finally
         {
-            _applicationPipe.Writer.Complete();
+            _transportPipe.Reader.Complete();
             Shutdown();
         }
     }
@@ -153,7 +153,6 @@ public class Connection : IAsyncDisposable
             finally
             {
                 _socket.Close();
-                _socket.Dispose();
             }
         }
     }
