@@ -31,7 +31,6 @@ public class InsecureSocketsLayer : TcpServerBase
                 {
                     var spec = buffer.Slice(0, specLength);
                     var specArr = spec.ToArray();
-                    Console.WriteLine(Convert.ToHexString(buffer.ToArray()));
                     if (IsNoOpCipher(specArr) || spec.Length == 1)
                     {
                         connection.Shutdown();
@@ -45,7 +44,6 @@ public class InsecureSocketsLayer : TcpServerBase
 
             if (cipher != null && buffer.Length > 0)
             {
-                Console.WriteLine("Decoding...");
                 var data = buffer.ToArray();
                 cipher.Decode(data);
                 await decrypted.Writer.WriteAsync(data);
@@ -58,7 +56,6 @@ public class InsecureSocketsLayer : TcpServerBase
                     decryptedPosition = decryptedBuffer.PositionOf((byte)'\n');
                     if (decryptedPosition != null)
                     {
-                        Console.WriteLine("Processing line...");
                         var response = ProcessRequest(decryptedBuffer.Slice(0, decryptedPosition.Value));
                         cipher.Encode(response);
                         await connection.Output.WriteAsync(response);
