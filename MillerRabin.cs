@@ -59,15 +59,15 @@ public class MillerRabin
     /// <returns></returns>
     public static bool IsPrime(BigInteger n)
     {
-        if (n % 2 == 0 || n < 4)
+        if (BigInteger.Remainder(n, 2) == 0 || n < 4)
         {
             return n == 2 || n == 3;
         }
-        BigInteger d = n - 1;
+        BigInteger d = BigInteger.Subtract(n, 1);
         int s = 0;
-        while(d % 2 == 0)
+        while(BigInteger.Remainder(d, 2) == 0)
         {
-            d /= 2;
+            d = BigInteger.Divide(d, 2);
             s++;
         }
 
@@ -76,19 +76,19 @@ public class MillerRabin
         {
             BigInteger x = BigInteger.ModPow(a, d, n);
 
-            if (x == 1 || x == n - 1)
+            if (x == 1 || x.CompareTo(BigInteger.Subtract(n, 1)) == 0)
             {
                 continue;
             }
             for (int i2 = 0; i2 < s; i2++)
             {
-                x = ((x * x) % n);
-                if (x == n - 1)
+                x = BigInteger.Remainder(BigInteger.Multiply(x, x), n);
+                if (x.CompareTo(BigInteger.Subtract(n, 1)) == 0)
                 {
                     break;
                 }
             }
-            if (x != n - 1)
+            if (x.CompareTo(BigInteger.Subtract(n, 1)) != 0)
             {
                 return false;
             }
@@ -114,11 +114,11 @@ public class MillerRabin
 
     private static BigInteger[] GetRounds(BigInteger n)
     {
-        if (n <  BigInteger.Parse("318665857834031151167461"))
+        if (n.CompareTo(BigInteger.Parse("318665857834031151167461")) < 0)
         {
             return new BigInteger[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37 };
         }
-        if (n <  BigInteger.Parse("3317044064679887385961981"))
+        if (n.CompareTo(BigInteger.Parse("3317044064679887385961981")) < 0)
         {
             return new BigInteger[] { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41 };
         }
@@ -126,7 +126,7 @@ public class MillerRabin
         var rounds = new BigInteger[20];
         for (int i = 0; i < 20; i++)
         {
-            rounds[i] = RandomInteger.Next(2, n - 2);
+            rounds[i] = RandomInteger.Next(2, BigInteger.Subtract(n, 2));
         }
         return rounds;
     }
