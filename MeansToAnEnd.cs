@@ -71,10 +71,10 @@ public class MeansToAnEnd : TcpServerBase
                 BigInteger sum = 0;
                 foreach (var p in filtered)
                 {
-                    sum += p.Price;
+                    sum = BigInteger.Add(sum, p.Price);
                 }
 
-                int median = (int)(sum / filtered.Count);
+                int median = (int)BigInteger.Divide(sum ,filtered.Count);
                 return median;
             }
             catch

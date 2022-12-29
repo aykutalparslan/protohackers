@@ -15,17 +15,17 @@ public class RandomInteger
     // https://stackoverflow.com/a/48855115/2015348
     private static BigInteger RandomInRange(RandomNumberGenerator rng, BigInteger min, BigInteger max)
     {
-        if (min > max)
+        if (min.CompareTo(max) > 0)
         {
             (min, max) = (max, min);
         }
 
         // offset to set min = 0
-        BigInteger offset = -min;
+        BigInteger offset = BigInteger.Negate(min);
         min = 0;
-        max += offset;
+        max = BigInteger.Add(max, offset);
 
-        var value = RandomInRangeFromZeroToPositive(rng, max) - offset;
+        var value = BigInteger.Subtract(RandomInRangeFromZeroToPositive(rng, max), offset);
         return value;
     }
 
@@ -63,7 +63,7 @@ public class RandomInteger
             value = new BigInteger(bytes);
 
             // `value > max` 50% of the times, in which case the fastest way to keep the distribution uniform is to try again
-        } while (value > max);
+        } while (value.CompareTo(max) > 0);
 
         return value;
     }
